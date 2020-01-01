@@ -1,0 +1,42 @@
+    @011//34232
+    D=A
+    @rows//3432fre
+    M=D//test
+(start)
+    @KBD ////
+    D=M
+    @scrn
+    D;JNE
+
+
+    @rows
+    D=M-1
+    @end
+    D;JLT
+    @SCREEN
+    A=D+A
+    M=!M
+    @rows
+    M=M-1
+
+
+    @end
+    D;JMP
+
+(scrn) //lol
+    @rows
+    D=M
+    @8192
+    D=D-A
+    @end
+    D;JGE //lol
+    @rows
+    D=M
+    @SCREEN // lol
+    A=D+A //lol
+    M=!M //lol
+    @rows
+    M=M+1
+(end)
+    @start
+    D;JMP
