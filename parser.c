@@ -1,5 +1,6 @@
 #include "parser.h"
 
+
 void parse_file(char* buffer) {
     char c= ' ';
     int total_chars = 0;
@@ -18,30 +19,25 @@ void parse_file(char* buffer) {
         parse_comments(line);
         enum command cmd = parse_command(line);
         if (cmd == A_COMMAND || cmd == L_COMMAND) {
-            printf("LC: ");
             char* symbol = (char*)malloc(100);
             if(parse_symbol(line, symbol, cmd) != 0) {
                 printf("Error parsing symbol: %s\n", line);
             } else {
-                printf("SYMBOL:%s\n", symbol);
             }
             free(symbol);
         }
         if (cmd == C_COMMAND) {
-            printf("C: ");
             //get dest
             char* dest = (char*)malloc(100);
             if(parse_dest(line, dest) != 0) {
                 printf("Error parsing dest: %s\n", line);
             } else {
-                printf("DEST:%s ", dest);
             }
             //get comp
             char* comp = (char*)malloc(100);
             int ret = 0;
             ret = parse_comp(line, comp);
             if(ret == 0) {
-                printf("COMP:%s ", comp);
 
             } else if (ret == 1) {
             } else {
@@ -51,14 +47,13 @@ void parse_file(char* buffer) {
             char* jump = (char*)malloc(100);
             ret = parse_jump(line, jump);
             if(ret == 0) {
-                printf("JUMP:%s", jump);
             } else if (ret == 1) {
             } else {
                 printf("Error parsing jump: %s\n", line);
             }
 
             char* command = parse_c_command(dest, comp, jump);
-
+            printf("CMD: %s", command);
             free(dest);
             free(comp);
             free(jump);
@@ -72,12 +67,28 @@ void parse_file(char* buffer) {
 }
 
 char* parse_c_command(const char* dest, const char* comp, const char* jump) {
+    char base[16] = "100";
     char* dest_code = "000";
-    char* comp_code = "0000000";
-    char* jump_code = "000";
-    // hash table??
+    ht_item* dest_item = get_ht_item(dest_ht, dest);
+    if (dest_item != NULL) dest_code = dest_item->value;
+    else printf("Invalid DST command: %s\n", dest);
 
-    return "0000";
+    char* comp_code = "0000000";
+    ht_item* comp_item = get_ht_item(comp_ht, comp);
+    if (comp_item != NULL) comp_code = comp_item->value;
+    else printf("Invalid CMP command: %s\n", comp);
+
+    char* jump_code = "000";
+    ht_item* jump_item = get_ht_item(jump_ht, jump);
+    if (jump_item != NULL) jump_code = jump_item->value;
+    else printf("Invalid JMP command: %s.\n", jump);
+
+    strcat(base, dest_code);
+    strcat(base, comp_code);
+    strcat(base, jump_code);
+    char* rbase = base;
+
+    return rbase;
 }
 
 int parse_comments(char* line) {
@@ -87,7 +98,7 @@ int parse_comments(char* line) {
     while(c != '\n') {
         c = line[i];
         if ((c == '/' && line[i+1] == '/') && start == 0) {
-            start = i;
+            start = i - 1;
         }
         i++;
     }

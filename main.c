@@ -1,5 +1,7 @@
 #include "main.h"
 
+#include "command_table.h"
+
 int main(int argc, char** argv) {
     if(argc < 2) {
         printf("Please input a file as the first argument\n");
@@ -28,8 +30,10 @@ int main(int argc, char** argv) {
     printf("\nEnd File\n");
 #endif
 
+    init_command_ht();
     parse_file(buffer);
     free(buffer);
+    free_command_ht();
 
     ret = fclose(file);
     if (ret) {

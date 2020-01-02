@@ -7,6 +7,8 @@
 
 #include <stdio.h>
 
+#include "command_table.h"
+
 void parse_file(char* buffer);
 enum command{NOT_SET=0,A_COMMAND=1,L_COMMAND=2,C_COMMAND=3};
 enum command parse_command(const char* line);
