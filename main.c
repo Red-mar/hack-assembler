@@ -3,14 +3,18 @@
 #include "command_table.h"
 
 int main(int argc, char** argv) {
+    char* filepath;
+    char* output_filename;
     if(argc < 2) {
         printf("Please input a file as the first argument\n");
         return 1;
     }
-    char* filepath = argv[1];
-
-
-    printf("Loading: %s as file!\n", filepath);
+    if (argc > 2) {
+        output_filename = argv[2];
+    } else {
+        output_filename = "output.hack";
+    }
+    filepath = argv[1];
 
     FILE* file;
     file = fopen(filepath, "r");
@@ -21,8 +25,10 @@ int main(int argc, char** argv) {
 
     int ret = 0;
     char* buffer;
-    buffer = (char *) malloc(5096);
-    ret = read_file(file, &buffer, 5096);
+    char* code;
+    buffer = (char *) malloc(2000000);
+    code = (char*) malloc(2000000);
+    ret = read_file(file, &buffer, 2000000);
 
 #ifdef DEBUG
     printf("Parsing file: \n\n");
@@ -31,13 +37,27 @@ int main(int argc, char** argv) {
 #endif
 
     init_command_ht();
-    parse_file(buffer);
+    parse_file(buffer, code);
+
+#ifdef DEBUG
+    printf("FINAL CODE\n%s\n",code);
+#endif
+
+    FILE* output_file;
+    output_file = fopen(output_filename, "w+");
+    fputs(code, output_file);
+
     free(buffer);
+    free(code);
     free_command_ht();
 
     ret = fclose(file);
     if (ret) {
         printf("Error closing file: %s\n", filepath);
+    }
+    ret = fclose(output_file);
+    if (ret) {
+        printf("Error closing file: %s\n", output_filename);
     }
 
     printf("Program ended successfully.\n");
