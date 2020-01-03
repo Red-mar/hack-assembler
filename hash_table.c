@@ -23,7 +23,7 @@ static int get_hash(const char* string, const int mod, const int size) {
 static int get_ht_hash(const char* string, const int size, const int attempts) {
     const int hash1 = get_hash(string, HT_PRIME, size);
     const int hash2 = get_hash(string, HT_PRIME2, size);
-    return hash1 + (attempts * (hash2 + 1)) % size;
+    return (hash1 + (attempts * (hash2 + 1))) % size;
 }
 
 static void free_ht_item(ht_item* item) {
@@ -48,6 +48,7 @@ static int get_free_hash(hash_table* ht, const char* key) {
         attempts++;
     }
     //resize
+    printf("\033[1;31mFREEHASH: HASHTABLE TOO SMALL!!!\033[0m\n");
     return -1;
 }
 
@@ -56,12 +57,11 @@ static int get_occupied_hash(hash_table* ht, const char* key) {
     int hash = 0;
     while (attempts < ht->size) {
         hash = get_ht_hash(key,ht->size,attempts);
-        if(ht->items[hash] != NULL) {
+        if(ht->items[hash] != NULL && strcmp(ht->items[hash]->key,key)==0) {
             return hash;
         }
         attempts++;
     }
-    // resize
     return -1;
 }
 
@@ -73,15 +73,17 @@ ht_item* new_ht_item(const char* key, const char* value) {
 }
 
 hash_table* new_hash_table(int size) {
-    hash_table* ht = (hash_table*)malloc(size * sizeof(ht_item));
+    hash_table* ht = (hash_table*)malloc(sizeof(hash_table));
     ht->size = size;
     ht->count = 0;
-    ht->items = (ht_item**)calloc(sizeof(ht_item), size);
+    ht->items = calloc(size, sizeof(ht_item*));
     return ht;
 }
 
 ht_item* get_ht_item(hash_table* ht, const char* key) {
+    if(strcmp(key, "")==0) return NULL;
     int hash = get_occupied_hash(ht, key);
+    if(hash == -1) return NULL;
     if (ht->items[hash] == &HT_DELETED_ITEM) return NULL;
     return ht->items[hash];
 }
