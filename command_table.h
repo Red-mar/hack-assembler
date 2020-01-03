@@ -10,4 +10,6 @@ extern hash_table* jump_ht;
 extern hash_table* dest_ht;
 extern hash_table* comp_ht;
 
+extern hash_table* symbol_ht;
+
 #endif // __COMMAND_TABLE_H_
