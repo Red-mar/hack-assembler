@@ -1,6 +1,7 @@
 #include "parser.h"
 
 static int variables = 0;
+static int absolute_file_lines = 0;
 
 char* to_binary16(int num, char* return_string) {
     for (int bits = 0; bits < 16; bits++) {
@@ -24,6 +25,7 @@ char* parse_file(char* buffer, char* code) {
     variables = 0;
 
     while(1) {
+        absolute_file_lines = 0;
         int total_chars = 0;
         int lines = 0;
         int i = 0;
@@ -77,6 +79,7 @@ char* parse_file(char* buffer, char* code) {
                 lines--;
             }
             lines++;
+            absolute_file_lines++;
             free(line);
             total_chars += i;
             i = 0;
@@ -123,17 +126,17 @@ char* parse_c_command(const char* dest, const char* comp, const char* jump, char
     char* dest_code = "000";
     ht_item* dest_item = get_ht_item(dest_ht, dest);
     if (dest_item != NULL) dest_code = dest_item->value;
-    else printf("Invalid DST command: %s\n", dest);
+    else printf("Invalid DST command: %s at %d\n", dest, absolute_file_lines);
 
     char* comp_code = "0000000";
     ht_item* comp_item = get_ht_item(comp_ht, comp);
     if (comp_item != NULL) comp_code = comp_item->value;
-    else printf("Invalid CMP command: %s\n", comp);
+    else printf("Invalid CMP command: %s at %d\n", comp, absolute_file_lines);
 
     char* jump_code = "000";
     ht_item* jump_item = get_ht_item(jump_ht, jump);
     if (jump_item != NULL) jump_code = jump_item->value;
-    else printf("Invalid JMP command: %s.\n", jump);
+    else printf("Invalid JMP command: %s at %d\n", jump, absolute_file_lines);
 
     strcat(return_string, comp_code);
     strcat(return_string, dest_code);
